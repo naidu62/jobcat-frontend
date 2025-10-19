@@ -5,9 +5,9 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
-      "/images/*",
-      "/assets/*",
       "/_next/*",
+      "/static/*",
+      "/public/*",
       "/favicon.ico",
       "/*.{png,jpg,jpeg,gif,svg,css,js,woff2,ttf}"
     ]
@@ -17,10 +17,5 @@
       "rewrite": "/index.html",
       "statusCode": 200
     }
-  },
-  "mimeTypes": {
-    ".json": "text/json",
-    ".js": "text/javascript",
-    ".html": "text/html"
   }
 }
