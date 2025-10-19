@@ -1,6 +1,7 @@
 // app/jobs/[id]/page.js
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -45,12 +46,9 @@ export default function JobDetails() {
       </p>
 
       <div className="mt-8">
-        <a
-          href="/"
-          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
+        <Link href="/" className="text-blue-600 hover:underline">
           ← Back to Jobs
-        </a>
+        </Link>
       </div>
     </div>
   );
