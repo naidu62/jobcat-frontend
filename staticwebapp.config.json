@@ -1,9 +1,15 @@
 {
+  "platform": {
+    "apiRuntime": "node:18"
+  },
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
+      "/images/*",
       "/assets/*",
-      "/*.{png,jpg,gif,ico,css,js,svg,woff2,ttf}"
+      "/_next/*",
+      "/favicon.ico",
+      "/*.{png,jpg,jpeg,gif,svg,css,js,woff2,ttf}"
     ]
   },
   "responseOverrides": {
@@ -14,6 +20,7 @@
   },
   "mimeTypes": {
     ".json": "text/json",
-    ".js": "text/javascript"
+    ".js": "text/javascript",
+    ".html": "text/html"
   }
 }
