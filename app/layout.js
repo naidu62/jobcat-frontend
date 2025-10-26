@@ -16,8 +16,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
         {/* 🟦 Global Header */}
-        <Header /><p className="text-center mt-4 text-red-500">Header test visible?</p>
-
+        <Header />
         {/* 🟩 Main Page Content */}
         <main className="flex-grow w-full py-8 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto bg-white border border-gray-200 shadow-sm rounded-xl p-6 sm:p-8">
