@@ -1,4 +1,13 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  reactStrictMode: true,
+  output: "standalone",
+  images: {
+    unoptimized: true,
+  },
+  experimental: {
+    optimizeCss: false, // ❌ disable critters issue
+  },
+};
 
-export default nextConfig;
+module.exports = nextConfig;
