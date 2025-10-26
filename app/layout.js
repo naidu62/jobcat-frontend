@@ -10,6 +10,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* 🔹 This ensures proper mobile scaling */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
         {/* 🟦 Global Header */}
         <Header /><p className="text-center mt-4 text-red-500">Header test visible?</p>
