@@ -8,15 +8,18 @@ export default function JobsList() {
 
   useEffect(() => {
     async function fetchJobs() {
+      const API_BASE =
+        process.env.NEXT_PUBLIC_API_BASE_URL || "https://app.jobcat.in";
+
+      console.log("Jobs API BASE:", API_BASE);
+
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/jobs/`,
-          { cache: "no-store" }
-        );
+        const res = await fetch(`${API_BASE}/api/jobs/`, {
+          cache: "no-store",
+        });
 
         const data = await res.json();
 
-        // ✅ IMPORTANT FIX
         if (Array.isArray(data)) {
           setJobs(data);
         } else {
