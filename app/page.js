@@ -1,4 +1,6 @@
 // app/page.js
+"use client";
+console.log("API BASE:", process.env.NEXT_PUBLIC_API_BASE_URL);
 import JobsList from "./components/JobsList";
 import DevelopmentNote from "./components/DevelopmentNote";
 

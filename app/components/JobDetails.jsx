@@ -3,72 +3,70 @@
 import JobSectionCard from "./JobSectionCard";
 
 export default function JobDetails({ job }) {
-  const hasValue = (v) => v && v !== "" && v !== null;
+  const hasValue = (v) => v !== undefined && v !== null && v !== "";
 
   return (
     <div className="space-y-6">
-      {/* Title */}
-      <h1 className="text-3xl font-bold text-blue-700 text-center">{job.title || "N/A"}</h1>
 
-      {/* Meta Info */}
-      <div className="text-center text-gray-600 text-sm">
-        {hasValue(job.category) && <p>Category: {job.category}</p>}
-        {hasValue(job.total_vacancies) && <p>Total Vacancies: {job.total_vacancies}</p>}
+      {/* 🧾 Title */}
+      <h1 className="text-3xl font-bold text-blue-700 text-center">
+        {job.job_title || "N/A"}
+      </h1>
+
+      {/* 🧭 Meta Info */}
+      <div className="text-center text-gray-600 text-sm space-y-1">
+        {hasValue(job.job_category) && <p>Category: {job.job_category}</p>}
+        {hasValue(job.job_type) && <p>Type: {job.job_type}</p>}
+        {hasValue(job.details?.no_of_posts) && (
+          <p>Total Vacancies: {job.details.no_of_posts}</p>
+        )}
       </div>
 
-      {/* Important Dates */}
-      {(hasValue(job.start_date) || hasValue(job.end_date) || hasValue(job.exam_date)) && (
+      {/* 📅 Important Dates */}
+      {(hasValue(job.application_start_date) ||
+        hasValue(job.application_end_date)) && (
         <JobSectionCard title="📅 Important Dates">
-          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-y-2">
-            {hasValue(job.start_date) && <li>Start Date: {job.start_date}</li>}
-            {hasValue(job.end_date) && <li>End Date: {job.end_date}</li>}
-            {hasValue(job.exam_date) && <li>Exam Date: {job.exam_date}</li>}
-            {hasValue(job.admit_release_date) && <li>Admit Card: {job.admit_release_date}</li>}
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
+            {hasValue(job.application_start_date) && (
+              <li>Application Start: {job.application_start_date}</li>
+            )}
+            {hasValue(job.application_end_date) && (
+              <li>Application End: {job.application_end_date}</li>
+            )}
           </ul>
         </JobSectionCard>
       )}
 
-      {/* Qualification */}
-      {hasValue(job.qualification) && (
+      {/* 🎓 Qualification */}
+      {hasValue(job.details?.qualification_text) && (
         <JobSectionCard title="🎓 Qualification">
-          <p>{job.qualification}</p>
+          <p>{job.details.qualification_text}</p>
         </JobSectionCard>
       )}
 
-      {/* Age Limit */}
-      {(hasValue(job.dob_from) || hasValue(job.dob_to)) && (
+      {/* 🎂 Age Limit */}
+      {hasValue(job.details?.age_limit_text) && (
         <JobSectionCard title="🎂 Age Limit">
-          <p>
-            {job.dob_from && `From: ${job.dob_from}`}{" "}
-            {job.dob_to && `to ${job.dob_to}`}
-          </p>
-          {hasValue(job.age_relaxation) && <p>Relaxation: {job.age_relaxation}</p>}
+          <p>{job.details.age_limit_text}</p>
         </JobSectionCard>
       )}
 
-      {/* Fees */}
-      {(hasValue(job.fee_general) || hasValue(job.fee_obc)) && (
-        <JobSectionCard title="💰 Application Fee">
-          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-y-1">
-            {hasValue(job.fee_general) && <li>General: {job.fee_general}</li>}
-            {hasValue(job.fee_obc) && <li>OBC: {job.fee_obc}</li>}
-            {hasValue(job.fee_sc) && <li>SC: {job.fee_sc}</li>}
-            {hasValue(job.fee_st) && <li>ST: {job.fee_st}</li>}
-            {hasValue(job.fee_female) && <li>Female: {job.fee_female}</li>}
-          </ul>
+      {/* 🧪 Selection Process */}
+      {hasValue(job.details?.selection_process_text) && (
+        <JobSectionCard title="🧪 Selection Process">
+          <p>{job.details.selection_process_text}</p>
         </JobSectionCard>
       )}
 
-      {/* Important Links */}
-      {(hasValue(job.apply_online_link) ||
-        hasValue(job.notification_pdf_link) ||
-        hasValue(job.official_website)) && (
+      {/* 🔗 Important Links */}
+      {(hasValue(job.apply_url) ||
+        hasValue(job.official_notification_url)) && (
         <JobSectionCard title="🔗 Important Links">
           <ul className="space-y-2">
-            {hasValue(job.apply_online_link) && (
+            {hasValue(job.apply_url) && (
               <li>
                 <a
-                  href={job.apply_online_link}
+                  href={job.apply_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
@@ -77,27 +75,15 @@ export default function JobDetails({ job }) {
                 </a>
               </li>
             )}
-            {hasValue(job.notification_pdf_link) && (
+            {hasValue(job.official_notification_url) && (
               <li>
                 <a
-                  href={job.notification_pdf_link}
+                  href={job.official_notification_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  Notification PDF
-                </a>
-              </li>
-            )}
-            {hasValue(job.official_website) && (
-              <li>
-                <a
-                  href={job.official_website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  Official Website
+                  Official Notification
                 </a>
               </li>
             )}

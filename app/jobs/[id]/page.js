@@ -8,21 +8,40 @@ import JobDetails from "@/app/components/JobDetails";
 
 export default function JobDetailPage() {
   const { id } = useParams();
+
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 🧠 Fetch single job from API
   useEffect(() => {
     if (!id) return;
 
     const fetchJob = async () => {
       try {
-        const res = await fetch(`https://app.jobcat.in/api/jobs/${id}/`);
-        if (!res.ok) throw new Error("Failed to fetch job");
+        setLoading(true);
+        setError(null);
+
+        const API_BASE =
+          process.env.NEXT_PUBLIC_API_BASE_URL || "https://app.jobcat.in";
+
+        const res = await fetch(`${API_BASE}/api/jobs/${id}/`, {
+          cache: "no-store",
+        });
+
+        if (res.status === 404) {
+          setJob(null);
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         const data = await res.json();
         setJob(data);
       } catch (err) {
         console.error("❌ Error fetching job:", err);
+        setError("Failed to load job details.");
       } finally {
         setLoading(false);
       }
@@ -31,18 +50,37 @@ export default function JobDetailPage() {
     fetchJob();
   }, [id]);
 
-  // ⏳ Loading state
-  if (loading)
-    return <p className="text-center py-10 text-gray-500">Loading job details...</p>;
+  // ⏳ Loading
+  if (loading) {
+    return (
+      <p className="text-center py-10 text-gray-500">
+        Loading job details...
+      </p>
+    );
+  }
 
-  // 🚫 Not found
-  if (!job)
-    return <p className="text-center py-10 text-red-500">Job not found.</p>;
+  // 🚫 Not Found
+  if (!job) {
+    return (
+      <p className="text-center py-10 text-red-500">
+        Job not found.
+      </p>
+    );
+  }
 
-  // ✅ Main render
+  // ❌ Error
+  if (error) {
+    return (
+      <p className="text-center py-10 text-red-500">
+        {error}
+      </p>
+    );
+  }
+
+  // ✅ Success
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
-      {/* 🔙 Back to Jobs Button */}
+      {/* 🔙 Back Button */}
       <div className="mb-6">
         <Link
           href="/"
