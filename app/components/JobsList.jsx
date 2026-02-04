@@ -1,6 +1,8 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import JobCard from "./JobCard";
+import { adaptJob } from "@/lib/jobAdapter";
 
 export default function JobsList() {
   const [jobs, setJobs] = useState([]);
@@ -11,17 +13,21 @@ export default function JobsList() {
       const API_BASE =
         process.env.NEXT_PUBLIC_API_BASE_URL || "https://app.jobcat.in";
 
-      console.log("Jobs API BASE:", API_BASE);
-
       try {
         const res = await fetch(`${API_BASE}/api/jobs/`, {
           cache: "no-store",
         });
 
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         const data = await res.json();
 
+        // ✅ STEP 7.3 FIX (THIS IS THE KEY)
         if (Array.isArray(data)) {
-          setJobs(data);
+          const adapted = data.map(adaptJob);
+          setJobs(adapted);
         } else {
           setJobs([]);
         }

@@ -1,4 +1,3 @@
-// app/components/JobDetails.jsx
 "use client";
 import JobSectionCard from "./JobSectionCard";
 
@@ -6,67 +5,65 @@ export default function JobDetails({ job }) {
   const hasValue = (v) => v !== undefined && v !== null && v !== "";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
-      {/* 🧾 Title */}
+      {/* 🧾 JOB TITLE */}
       <h1 className="text-3xl font-bold text-blue-700 text-center">
-        {job.job_title || "N/A"}
+        {job.title || "Untitled Job"}
       </h1>
 
-      {/* 🧭 Meta Info */}
+      {/* 🧭 META INFO */}
       <div className="text-center text-gray-600 text-sm space-y-1">
-        {hasValue(job.job_category) && <p>Category: {job.job_category}</p>}
-        {hasValue(job.job_type) && <p>Type: {job.job_type}</p>}
-        {hasValue(job.details?.no_of_posts) && (
-          <p>Total Vacancies: {job.details.no_of_posts}</p>
+        {hasValue(job.category) && <p>Category: {job.category}</p>}
+        {hasValue(job.type) && <p>Type: {job.type}</p>}
+        {hasValue(job.vacancies) && (
+          <p>Total Vacancies: {job.vacancies}</p>
         )}
       </div>
 
-      {/* 📅 Important Dates */}
-      {(hasValue(job.application_start_date) ||
-        hasValue(job.application_end_date)) && (
+      {/* 📅 IMPORTANT DATES */}
+      {(hasValue(job.startDate) || hasValue(job.endDate)) && (
         <JobSectionCard title="📅 Important Dates">
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
-            {hasValue(job.application_start_date) && (
-              <li>Application Start: {job.application_start_date}</li>
+          <ul className="space-y-2">
+            {hasValue(job.startDate) && (
+              <li>Application Start: {job.startDate}</li>
             )}
-            {hasValue(job.application_end_date) && (
-              <li>Application End: {job.application_end_date}</li>
+            {hasValue(job.endDate) && (
+              <li>Application End: {job.endDate}</li>
             )}
           </ul>
         </JobSectionCard>
       )}
 
-      {/* 🎓 Qualification */}
-      {hasValue(job.details?.qualification_text) && (
+      {/* 🎓 QUALIFICATION */}
+      {hasValue(job.qualification) && (
         <JobSectionCard title="🎓 Qualification">
-          <p>{job.details.qualification_text}</p>
+          <p>{job.qualification}</p>
         </JobSectionCard>
       )}
 
-      {/* 🎂 Age Limit */}
-      {hasValue(job.details?.age_limit_text) && (
+      {/* 🎂 AGE LIMIT */}
+      {hasValue(job.ageLimit) && (
         <JobSectionCard title="🎂 Age Limit">
-          <p>{job.details.age_limit_text}</p>
+          <p>{job.ageLimit}</p>
         </JobSectionCard>
       )}
 
-      {/* 🧪 Selection Process */}
-      {hasValue(job.details?.selection_process_text) && (
+      {/* 🧪 SELECTION PROCESS */}
+      {hasValue(job.selectionProcess) && (
         <JobSectionCard title="🧪 Selection Process">
-          <p>{job.details.selection_process_text}</p>
+          <p>{job.selectionProcess}</p>
         </JobSectionCard>
       )}
 
-      {/* 🔗 Important Links */}
-      {(hasValue(job.apply_url) ||
-        hasValue(job.official_notification_url)) && (
+      {/* 🔗 IMPORTANT LINKS */}
+      {(hasValue(job.applyUrl) || hasValue(job.notificationUrl)) && (
         <JobSectionCard title="🔗 Important Links">
           <ul className="space-y-2">
-            {hasValue(job.apply_url) && (
+            {hasValue(job.applyUrl) && (
               <li>
                 <a
-                  href={job.apply_url}
+                  href={job.applyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
@@ -75,10 +72,10 @@ export default function JobDetails({ job }) {
                 </a>
               </li>
             )}
-            {hasValue(job.official_notification_url) && (
+            {hasValue(job.notificationUrl) && (
               <li>
                 <a
-                  href={job.official_notification_url}
+                  href={job.notificationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
