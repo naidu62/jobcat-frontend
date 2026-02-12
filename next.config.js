@@ -6,7 +6,7 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    optimizeCss: false, // disable critters issue
+    optimizeCss: false,
   },
 };
 
