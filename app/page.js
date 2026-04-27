@@ -18,7 +18,7 @@ export default function HomePage() {
           Latest Jobs
         </h1>
         <p className="text-base text-gray-600">
-          Browse the latest verified job listings — filter by category or search.
+          Browse the latest verified job listings (updated just now) — filter by category or search.
         </p>
       </header>
 
