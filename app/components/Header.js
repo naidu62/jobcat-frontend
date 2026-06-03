@@ -1,12 +1,17 @@
 "use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        {/* 🔹 Logo + Title */}
+
+        {/* Logo */}
         <div className="flex items-center gap-3">
           <Image
             src="/logo.png"
@@ -16,6 +21,7 @@ export default function Header() {
             className="rounded-md border border-gray-300 bg-white p-1"
             priority
           />
+
           <Link
             href="/"
             className="text-2xl font-bold text-gray-900 hover:text-blue-700 transition-colors"
@@ -24,51 +30,88 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* 🔹 Nav Links (Desktop only) */}
+        {/* Desktop Menu */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
-          <Link href="/" className="hover:text-blue-600 transition-colors">
-            Jobs
-          </Link>
-          <Link href="/schemes" className="hover:text-blue-600 transition-colors">
-            Govt Schemes
-          </Link>
-          <Link href="/scholarships" className="hover:text-blue-600 transition-colors">
-            Scholarships
-          </Link>
-          <Link href="/resources" className="hover:text-blue-600 transition-colors">
-            Resources
-          </Link>
-          <Link href="/about" className="hover:text-blue-600 transition-colors">
-            About
-          </Link>
-          <Link href="/contact" className="hover:text-blue-600 transition-colors">
-            Contact
-          </Link>
+          <Link href="/">Jobs</Link>
+          <Link href="/schemes">Govt Schemes</Link>
+          <Link href="/scholarships">Scholarships</Link>
+          <Link href="/resources">Resources</Link>
+          <Link href="/about">About</Link>
+          <Link href="/contact">Contact</Link>
         </nav>
 
-        {/* 🔹 Auth Buttons (Desktop only) */}
+        {/* Desktop Auth */}
         <div className="hidden md:flex items-center gap-4">
           <Link
             href="/login"
-            className="text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100 transition"
+            className="text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
           >
             Sign in
           </Link>
+
           <Link
             href="/register"
-            className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+            className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
             Register
           </Link>
         </div>
 
-        {/* 🔹 Mobile Menu Button (visible on small screens) */}
-        <div className="md:hidden flex items-center">
-          <button className="p-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100"
+          >
             ☰
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200 bg-white">
+
+          <nav className="flex flex-col p-4 space-y-3 text-sm">
+
+            <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+              Jobs
+            </Link>
+
+            <Link href="/schemes" onClick={() => setMobileMenuOpen(false)}>
+              Govt Schemes
+            </Link>
+
+            <Link href="/scholarships" onClick={() => setMobileMenuOpen(false)}>
+              Scholarships
+            </Link>
+
+            <Link href="/resources" onClick={() => setMobileMenuOpen(false)}>
+              Resources
+            </Link>
+
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)}>
+              About
+            </Link>
+
+            <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+              Contact
+            </Link>
+
+            <hr />
+
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+              Sign in
+            </Link>
+
+            <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+              Register
+            </Link>
+
+          </nav>
+
+        </div>
+      )}
     </header>
   );
 }

@@ -50,15 +50,14 @@ export default function JobsList() {
     // 🔎 Search filter
     if (search.trim() !== "") {
       result = result.filter((job) =>
-        job.job_title.toLowerCase().includes(search.toLowerCase())
+        (job.title || "").toLowerCase().includes(search.toLowerCase())
       );
     }
 
     // 📦 Category filter (SAFE matching)
     if (category !== "all") {
       result = result.filter((job) => {
-        const cat = job.job_category?.toLowerCase() || "";
-
+        const cat = job.category?.toLowerCase() || "";
         if (category === "government") return cat.includes("gov");
         if (category === "private") return cat.includes("private");
         if (category === "railway") return cat.includes("railway");
