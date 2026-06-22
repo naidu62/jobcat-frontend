@@ -8,64 +8,81 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-3 py-2">
 
         {/* Logo */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+
           <Image
             src="/logo.png"
             alt="JobCat Logo"
-            width={40}
-            height={40}
-            className="rounded-md border border-gray-300 bg-white p-1"
+            width={36}
+            height={36}
+            className="rounded-md"
             priority
           />
 
           <Link
             href="/"
-            className="text-2xl font-bold text-gray-900 hover:text-blue-700 transition-colors"
+            className="text-xl font-bold text-gray-900"
           >
             JobCat.in
           </Link>
+
         </div>
 
         {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
+        <nav className="hidden md:flex items-center gap-5 text-sm font-medium text-gray-700">
+
           <Link href="/">Jobs</Link>
-          <Link href="/schemes">Govt Schemes</Link>
-          <Link href="/scholarships">Scholarships</Link>
-          <Link href="/resources">Resources</Link>
-          <Link href="/about">About</Link>
-          <Link href="/contact">Contact</Link>
+
+          <Link href="/schemes">
+            Govt Schemes
+          </Link>
+
+          <Link href="/scholarships">
+            Scholarships
+          </Link>
+
+          <Link href="/about">
+            About
+          </Link>
+
+          <Link href="/contact">
+            Contact
+          </Link>
+
         </nav>
 
-        {/* Desktop Auth */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop Buttons */}
+        <div className="hidden md:flex items-center gap-3">
+
           <Link
             href="/login"
-            className="text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+            className="text-sm border border-gray-300 px-3 py-1.5 rounded-md hover:bg-gray-100"
           >
-            Sign in
+            Sign In
           </Link>
 
           <Link
             href="/register"
-            className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700"
           >
             Register
           </Link>
+
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100"
-          >
-            ☰
-          </button>
-        </div>
+        <button
+          className="md:hidden p-2 border rounded-md"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          ☰
+        </button>
+
       </div>
 
       {/* Mobile Menu */}
@@ -78,33 +95,47 @@ export default function Header() {
               Jobs
             </Link>
 
-            <Link href="/schemes" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              href="/schemes"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Govt Schemes
             </Link>
 
-            <Link href="/scholarships" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              href="/scholarships"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Scholarships
             </Link>
 
-            <Link href="/resources" onClick={() => setMobileMenuOpen(false)}>
-              Resources
-            </Link>
-
-            <Link href="/about" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               About
             </Link>
 
-            <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Contact
             </Link>
 
             <hr />
 
-            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-              Sign in
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sign In
             </Link>
 
-            <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              href="/register"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Register
             </Link>
 
@@ -112,6 +143,7 @@ export default function Header() {
 
         </div>
       )}
+
     </header>
   );
 }

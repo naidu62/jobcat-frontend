@@ -1,23 +1,15 @@
-// app/jobs/loading.js
-
-export default function LoadingJobList() {
+export default function Loading() {
   return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold mb-4">Loading Jobs...</h1>
+    <div className="max-w-4xl mx-auto py-10 animate-pulse">
+      <div className="h-8 w-3/4 bg-gray-200 rounded mb-4"></div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="p-4 border rounded-lg shadow bg-white space-y-3"
-          >
-            <div className="h-5 bg-gray-300 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-8 bg-gray-300 rounded w-full mt-4"></div>
-          </div>
-        ))}
-      </div>
-    </main>
+      <div className="h-4 w-1/2 bg-gray-100 rounded mb-2"></div>
+
+      <div className="h-4 w-full bg-gray-100 rounded mb-2"></div>
+
+      <div className="h-4 w-full bg-gray-100 rounded mb-2"></div>
+
+      <div className="h-4 w-2/3 bg-gray-100 rounded"></div>
+    </div>
   );
 }

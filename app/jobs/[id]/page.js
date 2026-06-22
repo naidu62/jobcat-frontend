@@ -16,13 +16,13 @@ export default function JobDetailPage() {
   useEffect(() => {
     if (!id) return;
 
-    const fetchJob = async () => {
+    async function fetchJob() {
       try {
         setLoading(true);
-        setError(null);
 
         const API_BASE =
-          process.env.NEXT_PUBLIC_API_BASE_URL || "https://app.jobcat.in";
+          process.env.NEXT_PUBLIC_API_BASE_URL ||
+          "https://app.jobcat.in";
 
         const res = await fetch(`${API_BASE}/api/jobs/${id}/`, {
           cache: "no-store",
@@ -37,30 +37,43 @@ export default function JobDetailPage() {
 
         setJob(adapted);
       } catch (err) {
-        console.error("Error fetching job:", err);
+        console.error(err);
         setError("Failed to load job details.");
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchJob();
   }, [id]);
 
   if (loading) {
-    return <p className="text-center py-10">Loading job...</p>;
+    return (
+      <p className="text-center py-10">
+        Loading job details...
+      </p>
+    );
   }
 
   if (error) {
-    return <p className="text-center py-10 text-red-500">{error}</p>;
+    return (
+      <p className="text-center py-10 text-red-500">
+        {error}
+      </p>
+    );
   }
 
   if (!job) {
-    return <p className="text-center py-10">Job not found.</p>;
+    return (
+      <p className="text-center py-10">
+        Job not found.
+      </p>
+    );
   }
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
+
       <Link
         href="/"
         className="inline-block mb-6 px-4 py-2 border rounded"
@@ -69,6 +82,7 @@ export default function JobDetailPage() {
       </Link>
 
       <JobDetails job={job} />
+
     </div>
   );
 }

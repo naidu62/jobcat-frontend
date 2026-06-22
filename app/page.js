@@ -1,47 +1,40 @@
 "use client";
 
+import { useState } from "react";
+import SearchBar from "./components/SearchBar";
+import QualificationWidget from "./components/QualificationWidget";
+import CategoryWidget from "./components/CategoryWidget";
 import JobsList from "./components/JobsList";
-import DevelopmentNote from "./components/DevelopmentNote";
 
 export default function HomePage() {
+  const [query, setQuery] = useState("");
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-3 py-4">
 
-      {/* 🚧 Development Notice */}
-      <section className="mb-8">
-        <DevelopmentNote />
-      </section>
-
-      {/* 🧭 Title + Description */}
-      <header className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+      <header className="text-center mb-5">
+        <h1 className="text-2xl font-bold text-gray-900">
           Latest Jobs
         </h1>
 
-        <p className="text-base text-gray-600">
-          Browse the latest verified job listings — filter by category or search.
+        <p className="text-sm text-gray-600 mt-1">
+          Browse the latest verified job listings.
         </p>
       </header>
 
-      {/* 🗂️ Job Listings */}
-      <main>
-        <JobsList />
-      </main>
+      <SearchBar
+        query={query}
+        setQuery={setQuery}
+      />
 
-      {/* ⚫ Footer Section */}
-      <footer className="border-t border-gray-200 mt-16 pt-6 text-center text-sm text-gray-600">
-        <p>
-          © {new Date().getFullYear()}{" "}
-          <strong className="text-gray-800">
-            JobCat.in
-          </strong>{" "}
-          — All rights reserved.
-        </p>
+      {!query.trim() && (
+        <>
+          <QualificationWidget />
+          <CategoryWidget />
+        </>
+      )}
 
-        <p className="text-xs mt-1 text-gray-500">
-          Version 1.2.0
-        </p>
-      </footer>
+      <JobsList query={query} />
 
     </div>
   );
