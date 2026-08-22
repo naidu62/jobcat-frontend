@@ -1,0 +1,60 @@
+# systemd unit for the JobCat frontend (Next.js)
+# /etc/systemd/system/jobcat-frontend.service
+#
+# Reliability notes:
+# - ExecStart invokes node directly (no npm/sh wrapper layer), so systemd's
+#   MainPID IS the Next.js server process: signals reach it directly and the
+#   cgroup cannot leak children.
+# - ExecStartPre frees port 3000 from any stale/orphaned listener. At this
+#   point this unit's cgroup is always empty, so any process bound to :3000
+#   is by definition rogue and safe to kill. fuser exits non-zero when the
+#   port is already free, hence the leading "-".
+# - Graceful stop: SIGTERM -> up to 20s to drain -> SIGKILL fallback.
+#   Exit code 143 (SIGTERM) is treated as success.
+# - Restart=always with StartLimit* loop protection.
+
+[Unit]
+Description=JobCat Frontend v2 (Next.js)
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=180
+StartLimitBurst=10
+
+[Service]
+Type=exec
+User=venkat
+Group=venkat
+WorkingDirectory=/home/venkat/projects/jobcat-frontend
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+
+# --- Orphan prevention -----------------------------------------------------
+ExecStartPre=-/usr/bin/fuser -k 3000/tcp
+ExecStartPre=/bin/sleep 1
+
+# --- Direct server exec (systemd owns the Next.js process) ------------------
+ExecStart=/usr/bin/node /home/venkat/projects/jobcat-frontend/node_modules/next/dist/bin/next start -p 3000 -H 127.0.0.1
+
+# --- Graceful shutdown ------------------------------------------------------
+KillMode=control-group
+KillSignal=SIGTERM
+TimeoutStopSec=20
+SuccessExitStatus=143
+
+# --- Restart policy ---------------------------------------------------------
+Restart=always
+RestartSec=3
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jobcat-frontend
+UMask=0022
+
+# --- Hardening (from original template; /home stays writable) ---------------
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

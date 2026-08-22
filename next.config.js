@@ -8,6 +8,12 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
   },
+  async redirects() {
+    return [
+      // Resources section removed — keep legacy links working.
+      { source: "/resources", destination: "/", permanent: true },
+    ];
+  },
 };
 
 module.exports = nextConfig;

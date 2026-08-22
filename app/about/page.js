@@ -1,3 +1,10 @@
+export const metadata = {
+  title: "About Us",
+  description:
+    "JobCat.in — verified job notifications, government schemes and scholarships, built with patience, purpose and precision.",
+  alternates: { canonical: "/about" },
+};
+
 export default function AboutPage() {
   return (
     <main className="max-w-3xl mx-auto px-6 py-10 text-gray-700 leading-relaxed">
@@ -95,7 +102,7 @@ export default function AboutPage() {
 
       {/* Final Footer Note */}
       <footer className="mt-10 pt-6 border-t text-sm text-center text-gray-500">
-        © 2025 <strong>JobCat.in</strong> — A project by VN Techno-Soft Solutions.
+        JobCat.in — A project by VN Techno-Soft Solutions.
       </footer>
     </main>
   );

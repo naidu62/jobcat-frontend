@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import JobCard from "./JobCard";
+import { getJobs, unwrapList } from "@/lib/api";
 
 export default function JobsList() {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -15,24 +17,14 @@ export default function JobsList() {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const API_BASE =
-          process.env.NEXT_PUBLIC_API_BASE_URL || "https://app.jobcat.in";
-
-        const res = await fetch(`${API_BASE}/api/jobs/`, {
-          cache: "no-store",
-        });
-
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setJobs(data);
-          setFilteredJobs(data);
-        } else {
-          setJobs([]);
-          setFilteredJobs([]);
-        }
+        setError(null);
+        const data = await getJobs();
+        const list = unwrapList(data);
+        setJobs(list);
+        setFilteredJobs(list);
       } catch (err) {
         console.error("Jobs fetch error:", err);
+        setError("Failed to load jobs. Please try again later.");
         setJobs([]);
         setFilteredJobs([]);
       } finally {
@@ -81,7 +73,7 @@ export default function JobsList() {
       {/* 🔍 Search Bar */}
       <div className="flex justify-center">
         <input
-          type="text"
+          type="search"
           placeholder="Search jobs..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -114,7 +106,9 @@ export default function JobsList() {
       </div>
 
       {/* 📊 Results */}
-      {filteredJobs.length === 0 ? (
+      {error ? (
+        <p className="text-center text-red-500">{error}</p>
+      ) : filteredJobs.length === 0 ? (
         <p className="text-center text-gray-500">No jobs found</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
