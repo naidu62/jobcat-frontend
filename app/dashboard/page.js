@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import JobCard from "../components/JobCard";
 import {
   authFetch,
+  getUser,
   isAuthenticated,
   resolveMediaUrl,
 } from "@/lib/auth";
+import { listSavedJobs } from "@/lib/saved";
 import {
   fetchActivity,
   fetchRecommendations,
   listAlerts,
-  listApplications,
-  listSavedJobs,
 } from "@/lib/platform";
 
 function StatCard({ href, label, value, accent = "text-gray-900" }) {
@@ -31,6 +32,7 @@ function StatCard({ href, label, value, accent = "text-gray-900" }) {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [state, setState] = useState({ phase: "checking", me: null });
 
   const [savedCount, setSavedCount] = useState(0);
@@ -85,15 +87,22 @@ export default function DashboardPage() {
           .catch(() => {});
       } catch (err) {
         if (!cancelled) {
+          // Session died mid-flight (refresh rejected): go to login cleanly.
+          if (!isAuthenticated()) {
+            router.replace("/login?next=/dashboard");
+            return;
+          }
+          // Genuine failure while still authenticated: render with cached user.
           setError(err.message || "Could not load dashboard.");
-          setState({ phase: isAuthenticated() ? "ready" : "anon", me: null });
+          const cached = getUser();
+          setState({ phase: cached ? "ready" : "anon", me: cached });
         }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [router]);
 
   if (state.phase === "anon") {
     return (

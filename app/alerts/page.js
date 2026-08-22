@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AuthError } from "@/lib/auth";
 import {
-  AuthError,
   createAlert,
   deleteAlert as deleteAlertApi,
   listAlerts,
