@@ -1,252 +1,162 @@
 "use client";
 
 import JobSectionCard from "./JobSectionCard";
+import ImportantDatesSection from "./ImportantDatesSection";
+import { formatDisplayDate } from "@/lib/jobs";
+
+const has = (v) => v !== null && v !== undefined && v !== "" && v !== "N/A";
+
+function Row({ label, value }) {
+  if (!has(value)) return null;
+  return (
+    <div className="flex flex-col gap-0.5 rounded-lg bg-gray-50 px-3 py-2.5">
+      <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+        {label}
+      </span>
+      <span className="text-sm font-medium text-gray-900 break-words">{value}</span>
+    </div>
+  );
+}
 
 export default function JobDetails({ job }) {
-  const hasValue = (v) => v !== null && v !== undefined && v !== "";
+  const organization = has(job.organizationName) ? job.organizationName : job.companyName;
+  const company = has(job.organizationName) && has(job.companyName) && job.companyName !== job.organizationName ? job.companyName : null;
+  const locationParts = [job.location, job.district, job.state].filter(has);
+  const location = [...new Set(locationParts)].join(", ");
+
+  const salary =
+    has(job.salaryText) ? job.salaryText
+    : has(job.salary) ? job.salary
+    : has(job.salaryMin) && has(job.salaryMax) ? `₹${Number(job.salaryMin).toLocaleString("en-IN")} – ₹${Number(job.salaryMax).toLocaleString("en-IN")}`
+    : has(job.salaryMin) ? `₹${Number(job.salaryMin).toLocaleString("en-IN")}`
+    : has(job.salaryMax) ? `₹${Number(job.salaryMax).toLocaleString("en-IN")}`
+    : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
 
-      {/* Job Summary Card */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-        <h1 className="text-3xl font-bold text-blue-700 mb-4">
+      {/* ── Job Overview ─────────────────────────────────────────── */}
+      <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          {has(job.jobType) && (
+            <span className="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 capitalize">
+              {job.jobType}
+            </span>
+          )}
+          {has(job.category) && (
+            <span className="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">
+              {job.category}
+            </span>
+          )}
+          {job.isFeatured && (
+            <span className="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-700">
+              ⭐ Featured
+            </span>
+          )}
+        </div>
+
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
           {job.title}
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700">
-          <div>
-            <p className="font-semibold text-gray-500">Category</p>
-            <p>{job.category || "N/A"}</p>
-          </div>
+        {(organization || company || location || has(job.advertisementRefNo)) && (
+          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+            <Row label="Organization" value={organization} />
+            <Row label="Company" value={company} />
+            <Row label="Location" value={location} />
+            <Row label="Advertisement No." value={job.advertisementRefNo} />
+            <Row label="Total Vacancies" value={has(job.totalVacancies) ? job.totalVacancies : "N/A"} />
+            <Row label="Last Date" value={has(job.endDate) ? formatDisplayDate(job.endDate) : "N/A"} />
+          </dl>
+        )}
 
-          {hasValue(job.advertisementRefNo) && (
-            <div>
-              <p className="font-semibold text-gray-500">
-                Advertisement Ref No
-              </p>
-              <p>{job.advertisementRefNo}</p>
-            </div>
-          )}
+        {/* Quick apply CTA */}
+        {has(job.applyUrl) && (
+          <a
+            href={job.applyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 min-h-[44px] px-6 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition"
+          >
+            Apply Online →
+          </a>
+        )}
+      </section>
 
-          <div>
-            <p className="font-semibold text-gray-500">
-              Total Vacancies
-            </p>
-            <p>{job.totalVacancies}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Important Dates */}
-      <JobSectionCard title="📅 Important Dates">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-          {hasValue(job.startDate) && (
-            <div className="border-b pb-2">
-              <p className="text-gray-500 text-xs">
-                Application Start
-              </p>
-              <p>{job.startDate}</p>
-            </div>
-          )}
-
-          {hasValue(job.endDate) && (
-            <div className="border-b pb-2">
-              <p className="text-gray-500 text-xs">
-                Application End
-              </p>
-              <p>{job.endDate}</p>
-            </div>
-          )}
-
-          {hasValue(job.admitReleaseDate) && (
-            <div className="border-b pb-2">
-              <p className="text-gray-500 text-xs">
-                Admit Release
-              </p>
-              <p>{job.admitReleaseDate}</p>
-            </div>
-          )}
-
-          {hasValue(job.examDate) && (
-            <div className="border-b pb-2">
-              <p className="text-gray-500 text-xs">
-                Exam Date
-              </p>
-              <p>{job.examDate}</p>
-            </div>
-          )}
-
-          {hasValue(job.resultDate) && (
-            <div className="border-b pb-2">
-              <p className="text-gray-500 text-xs">
-                Result Date
-              </p>
-              <p>{job.resultDate}</p>
-            </div>
-          )}
-
-        </div>
-      </JobSectionCard>
-
-      {/* Qualification */}
-      {hasValue(job.qualification) && (
-        <JobSectionCard title="🎓 Qualification">
-          <p>{job.qualification}</p>
+      {/* ── Eligibility ──────────────────────────────────────────── */}
+      {(has(job.qualification) || has(job.experienceRequired) || has(job.ageLimit) || has(job.dobFrom) || has(job.dobTo)) && (
+        <JobSectionCard title="🎓 Eligibility">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <Row label="Qualification" value={job.qualification} />
+            <Row label="Experience Required" value={job.experienceRequired} />
+            <Row label="Age Limit" value={job.ageLimit} />
+            <Row label="DOB From" value={has(job.dobFrom) ? formatDisplayDate(job.dobFrom) : null} />
+            <Row label="DOB To" value={has(job.dobTo) ? formatDisplayDate(job.dobTo) : null} />
+          </dl>
         </JobSectionCard>
       )}
 
-      {/* Age Limit */}
-      {(hasValue(job.dobFrom) || hasValue(job.dobTo)) && (
-        <JobSectionCard title="🎂 Age Limit">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-            {hasValue(job.dobFrom) && (
-              <div>
-                <p className="text-gray-500 text-xs">
-                  DOB From
-                </p>
-                <p>{job.dobFrom}</p>
-              </div>
-            )}
-
-            {hasValue(job.dobTo) && (
-              <div>
-                <p className="text-gray-500 text-xs">
-                  DOB To
-                </p>
-                <p>{job.dobTo}</p>
-              </div>
-            )}
-
-          </div>
-
+      {/* ── Salary & Fees ────────────────────────────────────────── */}
+      {(salary || has(job.applicationFee)) && (
+        <JobSectionCard title="💰 Salary & Fees">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Row label="Salary" value={salary} />
+            <Row label="Application Fee" value={job.applicationFee} />
+          </dl>
         </JobSectionCard>
       )}
 
-      {/* Vacancy Details */}
+      {/* ── Selection Process ────────────────────────────────────── */}
+      {has(job.selectionProcess) && (
+        <JobSectionCard title="📝 Selection Process">
+          <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+            {job.selectionProcess}
+          </p>
+        </JobSectionCard>
+      )}
+
+      {/* ── Important Dates ──────────────────────────────────────── */}
+      <ImportantDatesSection job={job} />
+
+      {/* ── Vacancy Details ──────────────────────────────────────── */}
       {job.vacancyDetails?.length > 0 && (
-        <JobSectionCard title="📋 Vacancy Details">
-
-          <div className="overflow-x-auto">
-            <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-
+        <JobSectionCard title="📋 Post-wise Vacancies">
+          <div className="overflow-x-auto -mx-1 px-1">
+            <table className="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left px-4 py-3">
-                    Post Name
-                  </th>
-
-                  <th className="text-left px-4 py-3">
-                    Vacancies
-                  </th>
+                  <th className="text-left px-4 py-3 font-semibold">Post Name</th>
+                  <th className="text-left px-4 py-3 font-semibold">Vacancies</th>
                 </tr>
               </thead>
-
               <tbody>
                 {job.vacancyDetails.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-t"
-                  >
-                    <td className="px-4 py-3">
-                      {item.post_name}
-                    </td>
-
-                    <td className="px-4 py-3">
-                      {item.vacancy_number}
-                    </td>
+                  <tr key={item.id ?? item.post_name} className="border-t">
+                    <td className="px-4 py-3">{item.post_name}</td>
+                    <td className="px-4 py-3">{item.vacancy_number ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>
-
             </table>
           </div>
-
         </JobSectionCard>
       )}
 
-      {/* Additional Information */}
+      {/* ── Additional Information ───────────────────────────────── */}
       {job.extraFields?.length > 0 && (
-        <JobSectionCard title="ℹ Additional Information">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
+        <JobSectionCard title="ℹ️ Additional Information">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {job.extraFields.map((field, index) => (
-              <div
-                key={index}
-                className="border rounded-lg p-3"
-              >
-                <p className="text-xs text-gray-500 uppercase">
+              <div key={index} className="border rounded-lg p-3">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">
                   {field.field_name}
                 </p>
-
-                <p className="mt-1">
-                  {field.field_value}
-                </p>
+                <p className="mt-1 text-sm break-words">{field.field_value}</p>
               </div>
             ))}
-
-          </div>
-
+          </dl>
         </JobSectionCard>
       )}
-
-      {/* Important Links */}
-      <JobSectionCard title="🔗 Important Links">
-
-        <div className="grid gap-3">
-
-          {hasValue(job.applyUrl) && (
-            <a
-              href={job.applyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-            >
-              Apply Online
-            </a>
-          )}
-
-          {hasValue(job.admitCardUrl) && (
-            <a
-              href={job.admitCardUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-            >
-              Admit Card
-            </a>
-          )}
-
-          {hasValue(job.notificationUrl) && (
-            <a
-              href={job.notificationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-            >
-              Notification PDF
-            </a>
-          )}
-
-          {hasValue(job.officialWebsite) && (
-            <a
-              href={job.officialWebsite}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-            >
-              Official Website
-            </a>
-          )}
-
-        </div>
-
-      </JobSectionCard>
-
     </div>
   );
 }

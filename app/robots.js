@@ -6,9 +6,20 @@ export default function robots() {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
-        // Keep auth flows and on-site search results out of the index.
-        disallow: ["/login", "/register", "/search"],
+        // Public content surfaces are explicitly allowed for crawlers.
+        allow: ["/", "/jobs/", "/schemes/", "/scholarships/"],
+        // Keep private app surfaces out of the index.
+        disallow: [
+          "/admin/",
+          "/dashboard/",
+          "/api/",
+          "/login",
+          "/register",
+          "/settings",
+          "/verify-email",
+          "/reset-password",
+          "/search",
+        ],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
