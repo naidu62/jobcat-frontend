@@ -10,41 +10,78 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
 export default function GoogleLoginButton({ onCredential, onError, busy = false }) {
   const googleDivRef = useRef(null);
+  const mountedRef = useRef(true);
+  const flowBusyRef = useRef(false);
 
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // Only the first credential while busy is honored; a duplicated callback
+  // (e.g. the popup closing right after consent) can never re-trigger the
+  // parent flow after it has already produced its final state.
   const handleCredential = useCallback(
     (response) => {
+      if (flowBusyRef.current) return;
+      if (!mountedRef.current) return;
       if (!response?.credential) {
         onError?.("Google sign-in failed. No credentials received.");
         return;
       }
+      flowBusyRef.current = true;
       onCredential?.(response.credential);
     },
     [onCredential, onError]
   );
 
   // Fires when the popup is closed without consenting, consent is denied,
-  // or the flow fails client-side (never receives a credential).
+  // or the flow fails client-side (never receives a credential). Clears the
+  // busy state so no stale "Signing you in with Google…" box remains.
   const handleError = useCallback(
     (err) => {
+      flowBusyRef.current = false;
+      if (!mountedRef.current) return;
       if (err?.type === "popup_closed_by_user" || err?.type === "dismissed") {
         onError?.("Google sign-in was cancelled before finishing.");
+      } else if (err?.type === "popup_failed_to_open" || err?.type === "popup_blocked") {
+        onError?.("The Google sign-in window could not open. Please allow pop-ups and try again.");
       } else {
-        onError?.("Could not start Google sign-in. Please try again.");
+        onError?.("Could not complete Google sign-in. Please try again.");
       }
     },
     [onError]
   );
 
+  // Reset the internal busy guard whenever the parent finishes the flow
+  // (success, error, or cancellation all pass a fresh `busy=false`).
+  useEffect(() => {
+    if (!busy) flowBusyRef.current = false;
+  }, [busy]);
+
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID) return;
     const renderButton = () => {
-      if (!window.google?.accounts?.id || !googleDivRef.current) return;
+      if (!window.google?.accounts?.id || !googleDivRef.current || !mountedRef.current) return;
+      const div = googleDivRef.current;
+      // Clear any stale rendered/default prompt so a previous flow can never
+      // leave a leftover box in the layout.
+      if (window.google?.accounts?.id?.disableAutoSelect) {
+        try {
+          window.google.accounts.id.disableAutoSelect();
+        } catch {
+          /* ignore */
+        }
+      }
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: handleCredential,
         error_callback: handleError,
       });
-      window.google.accounts.id.renderButton(googleDivRef.current, {
+      div.innerHTML = "";
+      window.google.accounts.id.renderButton(div, {
         theme: "outline",
         size: "large",
         width: 360,
@@ -61,6 +98,15 @@ export default function GoogleLoginButton({ onCredential, onError, busy = false 
     script.defer = true;
     script.onload = renderButton;
     document.head.appendChild(script);
+    return () => {
+      if (window.google?.accounts?.id?.cancel) {
+        try {
+          window.google.accounts.id.cancel();
+        } catch {
+          /* ignore */
+        }
+      }
+    };
   }, [handleCredential, handleError]);
 
   if (!GOOGLE_CLIENT_ID) return null;

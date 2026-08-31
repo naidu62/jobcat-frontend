@@ -62,7 +62,7 @@ function ReplyComposer({ onSubmit, onCancel, busy }) {
   );
 }
 
-export default function CommentItem({ comment, me, onReplyPosted }) {
+export default function CommentItem({ comment, me, onReplyPosted, onDeleted }) {
   const [showReply, setShowReply] = useState(false);
   const [replies, setReplies] = useState(comment.replies ?? []);
   const [editing, setEditing] = useState(false);
@@ -115,6 +115,7 @@ export default function CommentItem({ comment, me, onReplyPosted }) {
     try {
       await deleteComment(comment.id);
       setRemoved(true);
+      onDeleted?.(comment.id);
     } catch (err) {
       alert(err.message || "Could not delete comment.");
     } finally {

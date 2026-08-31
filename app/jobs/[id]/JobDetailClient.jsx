@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import JobDetails from "@/app/components/JobDetails";
+import SafeBoundary from "@/app/components/SafeBoundary";
 import ImportantLinksSection from "@/app/components/ImportantLinksSection";
 import CommentSection from "@/app/components/comments/CommentSection";
 import TrackApplicationPanel from "@/app/components/TrackApplicationPanel";
@@ -92,14 +93,21 @@ export default function JobDetailClient({ id, initialJob = null }) {
 
       <JobDetails job={job} />
 
-      {/* Community + application actions */}
+      {/* Community + application actions — each island is isolated so one
+          failing widget can never take down the page. */}
       <div className="mt-5 space-y-5">
-        <ImportantLinksSection job={job} />
+        <SafeBoundary label="important-links" fallbackMessage="Share and links are temporarily unavailable.">
+          <ImportantLinksSection job={job} />
+        </SafeBoundary>
         {Number.isInteger(Number(job.id)) && (
-          <CommentSection targetType="job" targetId={job.id} />
+          <SafeBoundary label="comments" fallbackMessage="Comments are temporarily unavailable.">
+            <CommentSection targetType="job" targetId={job.id} />
+          </SafeBoundary>
         )}
         <div id="track-application">
-          <TrackApplicationPanel jobId={id} />
+          <SafeBoundary label="track-application" fallbackMessage="Application tracking is temporarily unavailable.">
+            <TrackApplicationPanel jobId={id} />
+          </SafeBoundary>
         </div>
       </div>
     </div>

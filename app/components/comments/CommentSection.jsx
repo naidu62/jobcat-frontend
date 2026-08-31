@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { MessageSquare, Loader2 } from "lucide-react";
 import CommentItem from "./CommentItem";
@@ -145,8 +146,20 @@ export default function CommentSection({ targetType, targetId }) {
           </div>
         </form>
       ) : (
-        <p className="mb-4 text-sm text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-4 py-3">
-          <a href="/login" className="font-medium text-blue-700 hover:underline">Sign in</a>{" "}
+        <p className="mb-4 text-sm text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-4 py-3">
+          <Link
+            href={`/login?next=${encodeURIComponent(`/jobs/${targetId}`)}`}
+            className="font-medium text-blue-700 hover:underline"
+          >
+            Sign in
+          </Link>{" "}
+          or{" "}
+          <Link
+            href={`/register?next=${encodeURIComponent(`/jobs/${targetId}`)}`}
+            className="font-medium text-blue-700 hover:underline"
+          >
+            register
+          </Link>{" "}
           to join the discussion. Comments are public to all visitors.
         </p>
       )}
@@ -177,7 +190,15 @@ export default function CommentSection({ targetType, targetId }) {
       ) : (
         <div className="divide-y divide-gray-100">
           {comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} me={me} />
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              me={me}
+              onDeleted={(id) => {
+                setComments((list) => list.filter((c) => c.id !== id));
+                setCount((c) => Math.max(0, c - 1));
+              }}
+            />
           ))}
         </div>
       )}

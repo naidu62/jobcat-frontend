@@ -11,6 +11,14 @@ import {
 } from "@/lib/auth";
 import GoogleLoginButton, { GoogleDivider } from "@/components/GoogleLoginButton";
 
+// Safe post-auth redirect: honor ?next=<path> when it is a local path so a
+// user sent here from a Job page returns there after authenticating.
+function localNext() {
+  if (typeof window === "undefined") return "/";
+  const target = new URLSearchParams(window.location.search).get("next");
+  return target && target.startsWith("/") && !target.startsWith("//") ? target : "/";
+}
+
 export default function RegisterPage() {
   const router = useRouter();
 
@@ -35,7 +43,7 @@ export default function RegisterPage() {
       try {
         await googleLogin(credential);
         window.dispatchEvent(new Event("jobcat-auth-sync"));
-        router.push("/");
+        router.push(localNext());
         router.refresh();
       } catch (err) {
         setError(err.message || "Google sign-in failed.");
