@@ -22,22 +22,84 @@ function XIcon({ size = 17, className = "" }) {
 }
 
 /**
+ * Copy text to the clipboard with layered fallbacks.
+ * NEVER throws: every path is individually guarded because a synchronous
+ * throw inside an event handler unmounts the whole React tree in
+ * production (Next.js "Application error: client-side exception").
+ *
+ * 1. Async Clipboard API (secure contexts only)
+ * 2. Hidden-textarea + execCommand fallback (http / older browsers)
+ */
+async function copyToClipboard(text) {
+  if (typeof window === "undefined") return false;
+  try {
+    const nav = typeof navigator !== "undefined" ? navigator : null;
+    if (nav?.clipboard && window.isSecureContext) {
+      await nav.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Permission denied / document not focused / insecure context:
+    // fall through to the legacy path below.
+  }
+  try {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.setAttribute("readonly", "");
+    el.style.position = "fixed";
+    el.style.top = "-9999px";
+    el.style.opacity = "0";
+    document.body.appendChild(el);
+    el.select();
+    // setSelectionRange is required for iOS Safari.
+    el.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(el);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/** True only when the Web Share API is actually callable in this browser. */
+function detectNativeShare() {
+  try {
+    return typeof navigator !== "undefined" && typeof navigator.share === "function";
+  } catch {
+    return false;
+  }
+}
+
+function toAbsolute(url) {
+  // navigator.share rejects relative URLs; make everything absolute.
+  if (!url) return "";
+  try {
+    return new URL(url, typeof window !== "undefined" ? window.location.origin : undefined).toString();
+  } catch {
+    return url;
+  }
+}
+
+/**
  * Share menu with native Web Share API support on mobile and explicit
  * fallbacks (Copy / WhatsApp / Telegram / Facebook / X) everywhere else.
+ * All handlers are crash-proof by design; feedback is surfaced via toast.
  */
 export default function ShareMenu({ url, title, className = "" }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
+  const [toast, setToast] = useState(null); // { ok: boolean, text: string }
   const rootRef = useRef(null);
+  const toastTimer = useRef(null);
 
   useEffect(() => {
-    setCanNativeShare(typeof navigator !== "undefined" && Boolean(navigator.share));
+    setCanNativeShare(detectNativeShare());
   }, []);
 
   // Close on outside click / Escape
   useEffect(() => {
-    if (!open) return;
+    if (!open || typeof document === "undefined") return;
     const onClick = (e) => {
       if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
     };
@@ -50,38 +112,66 @@ export default function ShareMenu({ url, title, className = "" }) {
     };
   }, [open]);
 
+  // Always clear the pending toast timer on unmount.
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  function showToast(ok, text) {
+    setToast({ ok, text });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2400);
+  }
+
   async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // Clipboard API unavailable (http or permissions): legacy fallback.
-      const el = document.createElement("textarea");
-      el.value = url;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+    const link = toAbsolute(url);
+    const ok = await copyToClipboard(link);
+    setCopied(ok);
+    showToast(
+      ok,
+      ok ? "Link copied to clipboard" : "Could not copy — long-press the page URL instead"
+    );
+    if (ok) setTimeout(() => setCopied(false), 1800);
   }
 
   async function nativeShare() {
+    const nav = typeof navigator !== "undefined" ? navigator : null;
+    if (!nav || typeof nav.share !== "function") {
+      // Should never happen (option is hidden), but never crash either.
+      copyLink();
+      return;
+    }
     try {
-      await navigator.share({ title, text: title, url });
+      await nav.share({ title: title || "", text: title || "", url: toAbsolute(url) });
       setOpen(false);
     } catch (err) {
-      if (err?.name !== "AbortError") console.error(err);
+      if (err?.name === "AbortError") return; // user dismissed the sheet
+      console.error("Web Share failed:", err);
+      showToast(false, "Sharing was blocked — link copied instead");
+      copyLink();
     }
   }
 
   function openPopup(shareUrl) {
-    window.open(shareUrl, "_blank", "noopener,noreferrer,width=640,height=560");
+    let win = null;
+    try {
+      win = window.open(shareUrl, "_blank", "noopener,noreferrer,width=640,height=560");
+    } catch {
+      win = null;
+    }
+    if (!win) {
+      // Popup blocked: navigate in the same tab rather than dying silently.
+      try {
+        window.location.href = shareUrl;
+      } catch {
+        showToast(false, "Popup blocked — please allow popups for this site");
+      }
+      return;
+    }
     setOpen(false);
   }
 
-  const encodedUrl = encodeURIComponent(url);
-  const encodedTitle = encodeURIComponent(title);
+  const safeUrl = toAbsolute(url);
+  const encodedUrl = encodeURIComponent(safeUrl);
+  const encodedTitle = encodeURIComponent(title || "");
 
   const options = [
     {
@@ -163,6 +253,20 @@ export default function ShareMenu({ url, title, className = "" }) {
             ))}
           </div>
         </>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium ${
+            toast.ok ? "bg-gray-900 text-white" : "bg-red-600 text-white"
+          }`}
+        >
+          {toast.ok ? <Check size={15} /> : null}
+          {toast.text}
+        </div>
       )}
     </div>
   );

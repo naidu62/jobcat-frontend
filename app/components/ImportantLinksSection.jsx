@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { MessageSquare, Share2, Star } from "lucide-react";
 import JobSectionCard from "./JobSectionCard";
 import ShareMenu from "./ShareMenu";
@@ -24,15 +25,27 @@ function LinkButton({ href, children }) {
  * Important Links card + community action row:
  *   [ 💬 Comment ] [ ↗ Share ] [ ⭐ Track Application ]
  */
-export default function ImportantLinksSection({ job }) {
-  const shareUrl =
-    typeof window !== "undefined" && job.slug
-      ? `${window.location.origin}/jobs/${job.slug}`
-      : `${SITE_URL}/jobs/${job.id}`;
+export default function ImportantLinksSection({ job = {} }) {
+  const slugOrId = job.slug || job.id;
+  // Deterministic on first render (server + client identical, so hydration
+  // can never mismatch), then upgraded to the real browser origin.
+  const [shareUrl, setShareUrl] = useState(`${SITE_URL}/jobs/${slugOrId}`);
+
+  useEffect(() => {
+    try {
+      setShareUrl(`${window.location.origin}/jobs/${job.slug || job.id}`);
+    } catch {
+      /* keep SITE_URL-based fallback */
+    }
+  }, [job.slug, job.id]);
 
   const scrollTo = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    try {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch {
+      /* no-op */
+    }
   };
 
   return (
@@ -49,7 +62,7 @@ export default function ImportantLinksSection({ job }) {
           <span className="hidden sm:inline">Comment</span>
         </button>
 
-        <ShareMenu url={shareUrl} title={job.title} />
+        <ShareMenu url={shareUrl} title={job.title || "JobCat"} />
 
         <button
           type="button"
